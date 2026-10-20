@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "ES2022",
+    "target": "ES2024",
+    "sourceMap": true,
+    "strict": true,
+    "moduleDetection": "force",
+    "rootDir": "./"          // <-- Permet que l'arrel de codi font sigui qualsevol lloc del projecte
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "include": [
+    "src/**/*"
+  ]
+}
