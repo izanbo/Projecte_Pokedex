@@ -83,8 +83,6 @@ export function reproduirCrit(soundUrl) {
  */
 export function renderitzarLlistaNoms(llista) {
     const ul = document.getElementById("pokemon-list");
-    if (!ul)
-        return;
     ul.innerHTML = ""; // Buidem el contenidor
     llista.forEach((p) => {
         const li = document.createElement("li");

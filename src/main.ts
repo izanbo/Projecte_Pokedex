@@ -1,5 +1,6 @@
 import * as Models from "./models.js";
 import * as Utils from "./utils.js";
+import {BasePokemon, IPokeApiDetail, IPokeApiListItem} from "./models.js";
 
 // ==========================================================
 // EXERCICI 1: Llistar els 151 Pokémon
@@ -26,8 +27,8 @@ async function carregarListaPokemon(): Promise<void> {
 
         // 5. Buidar el map i omplir-lo amb els nous pokemons
         mapaPokemon.clear();
-        dades.results.forEach((item) => {
-            const pokemon = new Models.BasePokemon(item);
+        dades.results.forEach((manolo :IPokeApiListItem) :void => {
+            const pokemon = new Models.BasePokemon(manolo);
             mapaPokemon.set(pokemon.id, pokemon);
         });
 
@@ -35,6 +36,8 @@ async function carregarListaPokemon(): Promise<void> {
         Utils.renderitzarLlistaNoms(Array.from(mapaPokemon.values()));
         Utils.amagarEstat();
         Utils.netejarCercador();
+
+        console.log(mapaPokemon);
 
     } catch (error) {
         // 7. Gestió d'errors
@@ -46,7 +49,7 @@ async function carregarListaPokemon(): Promise<void> {
 // Enganxar el listener al botó
 const btnShowAll = document.getElementById("btn-show-all") as HTMLButtonElement | null;
 if (btnShowAll) {
-    btnShowAll.addEventListener("click", () => {
+    btnShowAll.addEventListener("click", () :void => {
         void carregarListaPokemon();
     });
 }
@@ -57,6 +60,42 @@ if (btnShowAll) {
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 2 seguint els requisits
 
+const searchInput = document.getElementById("search-input") as HTMLInputElement;
+
+if (searchInput) {
+    searchInput.addEventListener("input", buscarPokemon);
+}
+
+async function buscarPokemon(): Promise<void> {
+    const query: string = searchInput.value;
+
+    if (query === "") {
+        Utils.renderitzarLlistaNoms(Array.from(mapaPokemon.values()));
+        return;
+    }
+
+    const numero: number = Number(query);
+
+    if (Number.isInteger(numero)) {
+
+        const pokemon :BasePokemon | undefined = mapaPokemon.get(numero);
+
+        if (pokemon) {
+            Utils.renderitzarLlistaNoms([pokemon]);
+        } else {
+            Utils.renderitzarLlistaNoms([]);
+        }
+
+    } else {
+
+        const filtrarNom: BasePokemon[] = Array.from(mapaPokemon.values()).filter(
+            (p: BasePokemon): boolean =>
+                p.name.toUpperCase().includes(query.toUpperCase())
+        );
+
+        Utils.renderitzarLlistaNoms(filtrarNom);
+    }
+}
 
 // ==========================================================
 // EXERCICI 3: Detall del Pokémon, cache i crit
