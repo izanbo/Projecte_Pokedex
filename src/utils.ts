@@ -95,8 +95,7 @@ export function reproduirCrit(soundUrl: string): void {
  *  - Afegir el <li> al contenidor amb appendChild.
  */
 export function renderitzarLlistaNoms(llista: Models.BasePokemon[]): void {
-    const ul = document.getElementById("pokemon-list") as HTMLUListElement | null;
-    if (!ul) return;
+    const ul = document.getElementById("pokemon-list") as HTMLUListElement;
 
     ul.innerHTML = ""; // Buidem el contenidor
 

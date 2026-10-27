@@ -19,14 +19,15 @@ async function carregarListaPokemon() {
         const dades = (await resposta.json());
         // 5. Buidar el map i omplir-lo amb els nous pokemons
         mapaPokemon.clear();
-        dades.results.forEach((item) => {
-            const pokemon = new Models.BasePokemon(item);
+        dades.results.forEach((manolo) => {
+            const pokemon = new Models.BasePokemon(manolo);
             mapaPokemon.set(pokemon.id, pokemon);
         });
         // 6. Convertir el Map a array, renderitzar i amagar estat
         Utils.renderitzarLlistaNoms(Array.from(mapaPokemon.values()));
         Utils.amagarEstat();
         Utils.netejarCercador();
+        console.log(mapaPokemon);
     }
     catch (error) {
         // 7. Gestió d'errors
@@ -45,6 +46,31 @@ if (btnShowAll) {
 // EXERCICI 2: Cercador en temps real
 // ==========================================================
 // TODO: Implementa la lògica de l'exercici 2 seguint els requisits
+const searchInput = document.getElementById("search-input");
+if (searchInput) {
+    searchInput.addEventListener("input", buscarPokemon);
+}
+async function buscarPokemon() {
+    const query = searchInput.value;
+    if (query === "") {
+        Utils.renderitzarLlistaNoms(Array.from(mapaPokemon.values()));
+        return;
+    }
+    const numero = Number(query);
+    if (Number.isInteger(numero)) {
+        const pokemon = mapaPokemon.get(numero);
+        if (pokemon) {
+            Utils.renderitzarLlistaNoms([pokemon]);
+        }
+        else {
+            Utils.renderitzarLlistaNoms([]);
+        }
+    }
+    else {
+        const filtrarNom = Array.from(mapaPokemon.values()).filter((p) => p.name.toUpperCase().includes(query.toUpperCase()));
+        Utils.renderitzarLlistaNoms(filtrarNom);
+    }
+}
 // ==========================================================
 // EXERCICI 3: Detall del Pokémon, cache i crit
 // ==========================================================
