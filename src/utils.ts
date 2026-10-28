@@ -94,20 +94,22 @@ export function reproduirCrit(soundUrl: string): void {
  *    (usa els getters formattedId i name).
  *  - Afegir el <li> al contenidor amb appendChild.
  */
+
 export function renderitzarLlistaNoms(llista: Models.BasePokemon[]): void {
-    const ul = document.getElementById("pokemon-list") as HTMLUListElement;
+    const ul = document.getElementById("pokemon-list") as HTMLUListElement | null;
 
-    ul.innerHTML = ""; // Buidem el contenidor
+    if (!ul) return;
 
-    llista.forEach((p) => {
+    ul.innerHTML = "";
+
+    llista.forEach((p: Models.BasePokemon) => {
         const li = document.createElement("li");
 
-        // Guardem dades al dataset per als propers exercicis
+        // Guardar les dades del Pokémon
         li.dataset.id = String(p.id);
         li.dataset.name = p.name;
         li.dataset.url = p.url;
 
-        // Creem el text: <strong>#025</strong> - pikachu
         const strong = document.createElement("strong");
         strong.textContent = p.formattedId;
 
@@ -117,10 +119,6 @@ export function renderitzarLlistaNoms(llista: Models.BasePokemon[]): void {
         ul.appendChild(li);
     });
 }
-
-
-
-// TODO: Implementa la lògica de l'exercici 1 seguint els requisits
 
 /**
  * EXERCICI 3
@@ -145,7 +143,53 @@ export function renderitzarLlistaNoms(llista: Models.BasePokemon[]): void {
  *  - Un cop pintat l'HTML, afegeix el listener de clic al botó i crida reproduirCrit().
  */
 
-// TODO: Implementa la lògica de l'exercici 3 seguint els requisits
+export function renderitzarDetallPokemon(pokemon: Models.DetailedPokemon): void {
+    const contenidor = document.getElementById("pokemon-detail");
+
+    if (!contenidor) return;
+
+    const cryUrl = pokemon.cryUrl;
+
+    contenidor.innerHTML = `
+        <div class="detail-card">
+            <h3>${pokemon.formattedId} ${pokemon.name}</h3>
+
+            <img src="${pokemon.imageUrl}" alt="${pokemon.name}">
+
+            ${
+            cryUrl !== null
+                ? `<button id="btn-play-cry" class="btn-cry">
+                           🔊 Escolta el crit
+                       </button>`
+                : ""
+        }
+
+            <p><strong>Pes:</strong> ${pokemon.weightKg} kg</p>
+
+            <p><strong>Tipus:</strong>
+                ${pokemon.types.map((type) => type.label).join(", ")}
+            </p>
+
+            <div class="stats-grid">
+                ${pokemon.stats.map(([name, value]) => `
+                    <div class="stat-box">
+                        <span>${name.toUpperCase()}</span>
+                        <strong>${value}</strong>
+                    </div>
+                `).join("")}
+            </div>
+        </div>
+    `;
+
+    if (cryUrl !== null) {
+        const botoCrit = document.getElementById("btn-play-cry");
+
+        botoCrit?.addEventListener("click", () => {
+                reproduirCrit(cryUrl);
+        });
+    }
+}
+
 
 
 /**
@@ -163,6 +207,22 @@ export function renderitzarLlistaNoms(llista: Models.BasePokemon[]): void {
  *  - Recorda afegir el botó correctament al contenidor
  */
 
-// TODO: Implementa la lògica de l'exercici 4 seguint els requisits
+export function generarBotonsTipus(): void {
+    const contenidor = document.getElementById("type-filter-container");
 
+    if (!contenidor) return;
+
+    contenidor.innerHTML = "";
+
+    Object.values(Models.POKEMON_TYPES).forEach((tipus) => {
+        const btn = document.createElement("button");
+
+        btn.className = "btn-type";
+        btn.dataset.type = String(tipus.id);
+        btn.style.backgroundColor = tipus.color;
+        btn.textContent = tipus.label;
+
+        contenidor.appendChild(btn);
+    });
+}
 

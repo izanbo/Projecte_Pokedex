@@ -9,6 +9,8 @@ import {BasePokemon, IPokeApiDetail, IPokeApiListItem} from "./models.js";
 // Map global per guardar la col·lecció de pokemons
 const mapaPokemon = new Map<number, Models.BasePokemon>();
 
+const cachePokemon = new Map<number, Models.DetailedPokemon>();
+
 async function carregarListaPokemon(): Promise<void> {
     // 1. Mostrar missatge de càrrega
     Utils.mostrarEstat("Carregant els 151 Pokémon...", "loading");
@@ -100,13 +102,77 @@ async function buscarPokemon(): Promise<void> {
 // ==========================================================
 // EXERCICI 3: Detall del Pokémon, cache i crit
 // ==========================================================
-// TODO: Implementa la lògica de l'exercici 3 seguint els requisits
+
+const llistaPokemon = document.getElementById("pokemon-list");
+
+llistaPokemon?.addEventListener("click", (event: MouseEvent) => {
+    const target = event.target;
+
+    if (!(target instanceof HTMLElement)) return;
+
+    const item = target.closest("li");
+
+    if (!(item instanceof HTMLLIElement)) return;
+
+    const id = Number(item.dataset.id);
+    const url = item.dataset.url;
+
+    if (!Number.isInteger(id) || id <= 0 || !url) return;
+
+    Utils.marcarItemActiu(item);
+
+    void carregarDetallPokemon(id, url);
+});
+
+async function carregarDetallPokemon(id: number, url: string): Promise<void> {
+    try {
+        // Comprovar si el Pokémon ja està a la caché
+        const pokemonGuardat = cachePokemon.get(id);
+
+        if (pokemonGuardat) {
+            Utils.renderitzarDetallPokemon(pokemonGuardat);
+            Utils.amagarEstat();
+            return;
+        }
+
+        // Mostrar missatge de càrrega
+        Utils.mostrarEstat("Carregant dades del Pokémon...", "loading");
+
+        // Consultar l'API
+        const resposta = await fetch(url);
+
+        if (!resposta.ok) {
+            throw new Error(`Error HTTP: ${resposta.status}`);
+        }
+
+        // Convertir la resposta al tipus corresponent
+        const dades = (await resposta.json()) as Models.IPokeApiDetail;
+
+        // Crear l'objecte complet del Pokémon
+        const pokemon = new Models.DetailedPokemon(dades, url);
+
+        // Guardar-lo a la caché
+        cachePokemon.set(id, pokemon);
+
+        // Mostrar-ne el detall
+        Utils.renderitzarDetallPokemon(pokemon);
+
+        // Amagar el missatge de càrrega
+        Utils.amagarEstat();
+    } catch (error) {
+        console.error("Error carregant el detall del Pokémon:", error);
+        Utils.mostrarEstat(
+            "No s'han pogut carregar les dades del Pokémon.",
+            "error"
+        );
+    }
+}
 
 
 // ==========================================================
 // EXERCICI 4: Botons de filtre per tipus
 // ==========================================================
-// TODO: Implementa la lògica de l'exercici 4 seguint els requisits
+Utils.generarBotonsTipus();
 
 
 // ==========================================================

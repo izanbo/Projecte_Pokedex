@@ -148,10 +148,9 @@ export class BasePokemon {
         this._name = item.name;
         this._url = item.url;
 
-        // Extraiem l'ID de la URL (ex: ".../pokemon/25/" -> 25)
-        // Utilitzem split per separar per "/", filter per treure els buits, pop per agafar l'últim i Number per convertir-ho a número.
         const parts = item.url.split("/").filter(Boolean);
         const lastPart = parts.pop();
+
         this._id = Number(lastPart);
     }
 
@@ -214,5 +213,51 @@ export class BasePokemon {
  *   get stats: retorna un array de type Stat
  */
 
+export class DetailedPokemon extends BasePokemon {
+    private _weightKg: number;
+    private _imageUrl: string;
+    private _types: PokemonType[];
+    private _stats: Stat[];
+    private _cryUrl: string | null;
 
+    constructor(data: IPokeApiDetail, url: string) {
+        super({
+            name: data.name,
+            url: url
+        });
 
+        this._weightKg = data.weight / 10;
+
+        this._imageUrl = data.sprites.front_default || "";
+
+        this._cryUrl = data.cries?.latest || null;
+
+        this._types = data.types
+            .map((t) => POKEMON_TYPES[t.type.name as PokemonTypeName])
+            .filter((type): type is PokemonType => type !== undefined);
+
+        this._stats = data.stats.map(
+            (s): Stat => [s.stat.name, s.base_stat]
+        );
+    }
+
+    get weightKg(): number {
+        return this._weightKg;
+    }
+
+    get imageUrl(): string {
+        return this._imageUrl;
+    }
+
+    get cryUrl(): string | null {
+        return this._cryUrl;
+    }
+
+    get types(): PokemonType[] {
+        return this._types;
+    }
+
+    get stats(): Stat[] {
+        return this._stats;
+    }
+}
