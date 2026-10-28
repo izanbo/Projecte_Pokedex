@@ -1,3 +1,4 @@
+import * as Models from "./models.js";
 // ==========================================================
 // PART A: FUNCIONS JA IMPLEMENTADES (no cal modificar-les)
 // ==========================================================
@@ -83,14 +84,15 @@ export function reproduirCrit(soundUrl) {
  */
 export function renderitzarLlistaNoms(llista) {
     const ul = document.getElementById("pokemon-list");
-    ul.innerHTML = ""; // Buidem el contenidor
+    if (!ul)
+        return;
+    ul.innerHTML = "";
     llista.forEach((p) => {
         const li = document.createElement("li");
-        // Guardem dades al dataset per als propers exercicis
+        // Guardar les dades del Pokémon
         li.dataset.id = String(p.id);
         li.dataset.name = p.name;
         li.dataset.url = p.url;
-        // Creem el text: <strong>#025</strong> - pikachu
         const strong = document.createElement("strong");
         strong.textContent = p.formattedId;
         li.appendChild(strong);
@@ -98,7 +100,6 @@ export function renderitzarLlistaNoms(llista) {
         ul.appendChild(li);
     });
 }
-// TODO: Implementa la lògica de l'exercici 1 seguint els requisits
 /**
  * EXERCICI 3
  * Renderitza la targeta de detall dins de <div id="pokemon-detail">.
@@ -121,7 +122,46 @@ export function renderitzarLlistaNoms(llista) {
  *  - El botó del crit només s'ha de pintar si pokemon.cryUrl no és null.
  *  - Un cop pintat l'HTML, afegeix el listener de clic al botó i crida reproduirCrit().
  */
-// TODO: Implementa la lògica de l'exercici 3 seguint els requisits
+export function renderitzarDetallPokemon(pokemon) {
+    const contenidor = document.getElementById("pokemon-detail");
+    if (!contenidor)
+        return;
+    const cryUrl = pokemon.cryUrl;
+    contenidor.innerHTML = `
+        <div class="detail-card">
+            <h3>${pokemon.formattedId} ${pokemon.name}</h3>
+
+            <img src="${pokemon.imageUrl}" alt="${pokemon.name}">
+
+            ${cryUrl !== null
+        ? `<button id="btn-play-cry" class="btn-cry">
+                           🔊 Escolta el crit
+                       </button>`
+        : ""}
+
+            <p><strong>Pes:</strong> ${pokemon.weightKg} kg</p>
+
+            <p><strong>Tipus:</strong>
+                ${pokemon.types.map((type) => type.label).join(", ")}
+            </p>
+
+            <div class="stats-grid">
+                ${pokemon.stats.map(([name, value]) => `
+                    <div class="stat-box">
+                        <span>${name.toUpperCase()}</span>
+                        <strong>${value}</strong>
+                    </div>
+                `).join("")}
+            </div>
+        </div>
+    `;
+    if (cryUrl !== null) {
+        const botoCrit = document.getElementById("btn-play-cry");
+        botoCrit?.addEventListener("click", () => {
+            reproduirCrit(cryUrl);
+        });
+    }
+}
 /**
  * EXERCICI 4
  * Genera un botó per a cada tipus dins de <div id="type-filter-container">.
@@ -136,5 +176,18 @@ export function renderitzarLlistaNoms(llista) {
  *       btn.textContent = el label del tipus
  *  - Recorda afegir el botó correctament al contenidor
  */
-// TODO: Implementa la lògica de l'exercici 4 seguint els requisits
+export function generarBotonsTipus() {
+    const contenidor = document.getElementById("type-filter-container");
+    if (!contenidor)
+        return;
+    contenidor.innerHTML = "";
+    Object.values(Models.POKEMON_TYPES).forEach((tipus) => {
+        const btn = document.createElement("button");
+        btn.className = "btn-type";
+        btn.dataset.type = String(tipus.id);
+        btn.style.backgroundColor = tipus.color;
+        btn.textContent = tipus.label;
+        contenidor.appendChild(btn);
+    });
+}
 //# sourceMappingURL=utils.js.map
